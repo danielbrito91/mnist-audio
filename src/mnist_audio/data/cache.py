@@ -5,7 +5,7 @@ import numpy as np
 import polars as pl
 
 from src.mnist_audio.config import EXPECTED_COLUMNS
-from src.mnist_audio.data import AudioMetadata
+from src.mnist_audio.data.metadata import AudioMetadata
 
 
 class ParquetAudioCache:
@@ -31,25 +31,25 @@ class ParquetAudioCache:
         if not self.exists():
             return None
 
-        row = self._read().filter(pl.col('idx') == idx)
-        if row.shape[0] == 0:
+        df = self._read()
+        if idx < 0 or idx >= df.shape[0]:
             return None
 
-        if not set(row.columns) == set(EXPECTED_COLUMNS):
+        if not set(df.columns) == set(EXPECTED_COLUMNS):
             raise ValueError(
-                f'Expected columns: {EXPECTED_COLUMNS}, but got: {row.columns}'
+                f'Expected columns: {EXPECTED_COLUMNS}, but got: {df.columns}'
             )
 
-        mel_flat = row['mel_flat'].item().to_numpy()
-        shape = (row['n_mels'].item(), row['n_frames'].item())
-        spectrogram = np.array(mel_flat).reshape(shape)
-        metadata_dict = row.select([
-            'file_path',
-            'speaker_id',
-            'utt_id',
-            'label',
-        ]).to_dicts()[0]
-        metadata = AudioMetadata(**metadata_dict)
+        row = df.row(idx, named=True)
+        mel_flat = np.array(row['mel_flat'])
+        shape = (row['n_mels'], row['n_frames'])
+        spectrogram = mel_flat.reshape(shape)
+        metadata = AudioMetadata(
+            file_path=row['file_path'],
+            speaker_id=row['speaker_id'],
+            utt_id=row['utt_id'],
+            label=row['label'],
+        )
         return spectrogram, metadata
 
     def load_all(self) -> List[Tuple[np.ndarray, AudioMetadata]]:
