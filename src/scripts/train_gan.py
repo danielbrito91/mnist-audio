@@ -5,9 +5,9 @@ from torch.utils.data import DataLoader
 
 from src.mnist_audio.config import (
     DATA_RAW_DIR,
-    SAMPLE_RATE,
     TEST_CACHE_PATH,
     TRAIN_CACHE_PATH,
+    STFTConfig,
 )
 from src.mnist_audio.data import (
     AudioMNISTDataset,
@@ -24,7 +24,7 @@ train_files, test_files = create_split_from_files(files)
 train_cache = ParquetAudioCache(Path(TRAIN_CACHE_PATH))
 test_cache = ParquetAudioCache(Path(TEST_CACHE_PATH))
 
-preprocessor = STFTProcessor(sample_rate=SAMPLE_RATE)
+preprocessor = STFTProcessor(config=STFTConfig())
 
 train_dataset = AudioMNISTDataset(train_files, train_cache, preprocessor)
 test_dataset = AudioMNISTDataset(test_files, test_cache, preprocessor)

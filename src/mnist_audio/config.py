@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-DATA_RAW_DIR = Path('data/raw')
+DATA_RAW_DIR = Path('data/raw/data')
 TRAIN_CACHE_PATH = Path('data/.cache/audio_mnist_train.zstd')
 TEST_CACHE_PATH = Path('data/.cache/audio_mnist_test.zstd')
 BEST_MODEL_PATH = Path('checkpoints/best_model.pth')

@@ -5,9 +5,9 @@ from torch.utils.data import DataLoader
 
 from src.mnist_audio.config import (
     DATA_RAW_DIR,
-    SAMPLE_RATE,
     TEST_CACHE_PATH,
     TRAIN_CACHE_PATH,
+    STFTConfig,
 )
 from src.mnist_audio.data import (
     AudioMNISTDataset,
@@ -24,7 +24,7 @@ train_files, test_files = create_split_from_files(files)
 train_cache = ParquetAudioCache(Path(TRAIN_CACHE_PATH))
 test_cache = ParquetAudioCache(Path(TEST_CACHE_PATH))
 
-preprocessor = STFTProcessor(sample_rate=SAMPLE_RATE)
+preprocessor = STFTProcessor(config=STFTConfig())
 
 train_dataset = AudioMNISTDataset(train_files, train_cache, preprocessor)
 test_dataset = AudioMNISTDataset(test_files, test_cache, preprocessor)
@@ -33,20 +33,20 @@ test_dataset = AudioMNISTDataset(test_files, test_cache, preprocessor)
 def main() -> None:
     train_loader = DataLoader(
         train_dataset,
-        batch_size=32,
+        batch_size=128,
         shuffle=True,
-        num_workers=os.cpu_count() or 0,  # spawn-safe after pickling fix
+        num_workers=8,
         persistent_workers=True,
-        pin_memory=False,  # MPS backend ignores pinned memory
+        pin_memory=True,
     )
 
     val_loader = DataLoader(
         test_dataset,
-        batch_size=32,
+        batch_size=128,
         shuffle=False,
-        num_workers=os.cpu_count() or 0,
+        num_workers=8,
         persistent_workers=True,
-        pin_memory=False,
+        pin_memory=True,
     )
 
     # Create model
