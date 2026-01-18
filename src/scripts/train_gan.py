@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from torch.utils.data import DataLoader
@@ -33,25 +32,30 @@ test_dataset = AudioMNISTDataset(test_files, test_cache, preprocessor)
 def main() -> None:
     train_loader = DataLoader(
         train_dataset,
-        batch_size=32,
+        batch_size=128,
         shuffle=True,
-        num_workers=os.cpu_count() or 0,  # spawn-safe after pickling fix
+        num_workers=8,
         persistent_workers=True,
-        pin_memory=False,  # MPS backend ignores pinned memory
+        pin_memory=True,
     )
 
     val_loader = DataLoader(
         test_dataset,
-        batch_size=32,
+        batch_size=128,
         shuffle=False,
-        num_workers=os.cpu_count() or 0,
+        num_workers=8,
         persistent_workers=True,
-        pin_memory=False,
+        pin_memory=True,
     )
 
     # Create model
-    generator = Generator(z_dim=100, hidden_dim=128, n_mels=128, n_frames=128)
-    discriminator = Discriminator(n_mels=128, n_frames=128, hidden_dim=128)
+    z_dim, hidden_dim, n_mels, n_frames = 100, 128, 80, 53
+    generator = Generator(
+        z_dim=z_dim, hidden_dim=hidden_dim, n_mels=n_mels, n_frames=n_frames
+    )
+    discriminator = Discriminator(
+        n_mels=n_mels, n_frames=n_frames, hidden_dim=hidden_dim
+    )
 
     # Train model
     train_gan_model(
@@ -60,11 +64,14 @@ def main() -> None:
         train_loader,
         val_loader,
         criterion=None,
-        optimizer=None,
         device=None,
         num_epochs=100,
-        lr=1e-3,
+        lr_generator=2e-4,
+        lr_discriminator=1e-4,
         save_dir=None,
+        z_dim=z_dim,
+        n_critic=1,  # Train D every batch
+        n_gen=3,  # Train G 3x per D step (helps G catch up)
     )
 
 

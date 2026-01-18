@@ -9,6 +9,7 @@ dependencies = [
     "kaggle>=1.8.3",
     "librosa>=0.11.0",
     "polars>=1.31.0",
+    "pyarrow>=23.0.0",
     "silero-vad>=5.1.2",
     "torch>=2.8.0",
     "torchaudio>=2.8.0",
@@ -33,6 +34,7 @@ dev-dependencies = [
     "taskipy>=1.14.1",
     "tqdm>=4.67.1",
     "factory-boy>=3.3.3",
+    "seaborn>=0.13.2",
 ]
 
 [tool.ruff]
