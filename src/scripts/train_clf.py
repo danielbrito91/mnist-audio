@@ -16,7 +16,7 @@ from src.mnist_audio.data import (
 from src.mnist_audio.data.cache import ParquetAudioCache
 from src.mnist_audio.models import SimpleCNN
 from src.mnist_audio.preprocessing import STFTProcessor
-from src.mnist_audio.training.trainer import train_model
+from src.mnist_audio.training.clf_trainer import train_model
 
 files = [str(f) for f in list(DATA_RAW_DIR.glob('**/*.wav'))]
 train_files, test_files = create_split_from_files(files)

@@ -5,7 +5,7 @@ import numpy as np
 import polars as pl
 
 from src.mnist_audio.config import EXPECTED_COLUMNS
-from src.mnist_audio.data import AudioMetadata
+from src.mnist_audio.data.metadata import AudioMetadata
 
 
 class ParquetAudioCache:
